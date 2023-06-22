@@ -60,7 +60,7 @@ app.post('/api/persons',(request,response)=>{
      
       }if(persons.find(elem=>elem.name===body.name) ){
         return response.status(400).json({
-            error:"The name already exists!!"
+             error: 'name must be unique' 
         })
       }
       let person = {
