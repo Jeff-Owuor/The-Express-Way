@@ -5,6 +5,15 @@ let tiny = morgan('tiny')
 app.use(express.json())
 app.use(tiny);
 
+function logRequestBody(req, res, next) {
+  if (req.method === 'POST') {
+    console.log(JSON.stringify(req.body));
+  }
+  next();
+}
+
+app.use(logRequestBody);
+
 let persons  = [
     { 
       "id": 1,
