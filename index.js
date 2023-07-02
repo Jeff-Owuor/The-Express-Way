@@ -1,9 +1,12 @@
 const express = require('express')
 const app = express()
+const cors = require('cors')
 var morgan = require('morgan')
 let tiny = morgan('tiny')
 app.use(express.json())
 app.use(tiny);
+app.use(cors())
+app.use(express.static('build'))
 
 function logRequestBody(req, res, next) {
   if (req.method === 'POST') {
