@@ -41,8 +41,9 @@ let persons  = [
     }
 ]
 app.get('/api/persons', (request, response) => {
+  Phonebook.find({}).then((persons)=>{
     response.json(persons)
-
+  })
   })
 
 app.get('/info',(request,response)=>{ 
@@ -52,20 +53,22 @@ app.get('/info',(request,response)=>{
    `)
 })
 
-app.get('/api/persons/:id',(request,response)=>{
-    const id = Number(request.params.id);
-    let person= persons.find((person)=>person.id===parseInt(id));
+app.get('/api/persons/:id',(request,response,next)=>{
+  Phonebook.findById(request.params.id).then(person=>{
     if(person){
-        response.json(person)
+      response.json(person)
     }else{
-        response.status(404).end();
+      response.status(404).end()
     }
+  }).catch(err=>next(err))
 })
 
-app.delete('/api/persons/:id',(request,response)=>{
-    const id = Number(request.params.id);
-    persons = persons.filter(elem=> elem.id !== id)
-    response.status(204).end()
+app.delete('/api/persons/:id',(request,response, next)=>{
+    Phonebook.findByIdAndRemove(request.params.id)
+                           .then(()=> {
+                            response.status(204).end()
+                           })
+                           .catch(err=>next(err))
 })
 const generateId = () => Math.floor(Math.random()*100000)
 app.post('/api/persons',(request,response)=>{
@@ -84,6 +87,18 @@ app.post('/api/persons',(request,response)=>{
        response.json(person)
      })
 })
+
+app.put('/api/persons/:id',(request,response,next)=>{
+  const body  = request.body;
+  const person = {
+    name:body.name,
+    number:body.number
+  }
+  Phonebook.findByIdAndUpdate(request.params.id,person,{new:true})
+                         .then(person=>{
+                          response.json(person)})
+                          .catch(err=>next(err))
+                         })
 
   const PORT = 3001
   app.listen(PORT, () => {
