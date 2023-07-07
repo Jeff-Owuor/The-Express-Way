@@ -7,6 +7,7 @@ app.use(express.json())
 app.use(tiny);
 app.use(cors())
 app.use(express.static('build'))
+const Phonebook = require("./models/Phonebook")
 
 function logRequestBody(req, res, next) {
   if (req.method === 'POST') {
@@ -41,6 +42,7 @@ let persons  = [
 ]
 app.get('/api/persons', (request, response) => {
     response.json(persons)
+
   })
 
 app.get('/info',(request,response)=>{ 
@@ -73,18 +75,14 @@ app.post('/api/persons',(request,response)=>{
           error: 'Please make sure you have entered a name/ number' 
         })
      
-      }if(persons.find(elem=>elem.name===body.name) ){
-        return response.status(400).json({
-             error: 'name must be unique' 
-        })
       }
-      let person = {
+      let person = new Phonebook({
           name: body.name,
           number: body.number,
-          id:generateId(),
-      }
-      persons = persons.concat(person)
-      response.json(person)
+      })
+     person.save().then(()=>{
+       response.json(person)
+     })
 })
 
   const PORT = 3001
