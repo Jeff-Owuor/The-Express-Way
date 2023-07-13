@@ -10,7 +10,11 @@ mongoose.connect(url).then((result)=>{
  console.log(`Error occurred when connecting to MongoDb ${error.message}`)
 })
 const phoneBookSchema = mongoose.Schema({
-    name:String,
+    name:{
+        type:String,
+        minLength: 3,
+        required:true
+    },
     number:String
 })
 
