@@ -71,7 +71,7 @@ app.delete('/api/persons/:id',(request,response, next)=>{
                            .catch(err=>next(err))
 })
 const generateId = () => Math.floor(Math.random()*100000)
-app.post('/api/persons',(request,response)=>{
+app.post('/api/persons',(request,response,next)=>{
     const  body = request.body;
     if (!body.name || !body.number) {
         return response.status(400).json({ 
@@ -85,7 +85,7 @@ app.post('/api/persons',(request,response)=>{
       })
      person.save().then(()=>{
        response.json(person)
-     })
+     }).catch(err=>next(err))
 })
 
 app.put('/api/persons/:id',(request,response,next)=>{
@@ -99,6 +99,17 @@ app.put('/api/persons/:id',(request,response,next)=>{
                           response.json(person)})
                           .catch(err=>next(err))
                          })
+
+ const errorHandler = (error,request,response,next)=>{
+            console.error(error.message)
+            if(error.name === "CastError"){
+                   return response.status(400).send({error:"Malinformed Id"})
+            }else if(error.name === "ValidationError"){
+                    return response.status(400).json({error:error.message})
+                          }
+           next(error)
+                        }  
+app.use(errorHandler)
 
   const PORT = 3001
   app.listen(PORT, () => {
